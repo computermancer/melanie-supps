@@ -8,20 +8,55 @@
   <meta http-equiv="Expires" content="0" />
   <title>Support Guide App</title>
   <script>
-    // Register service worker
+    // Register service worker with update handling
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
           .then(registration => {
-            console.log('ServiceWorker registration successful');
-            // Check for updates every hour
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            
+            // Check for updates immediately
+            registration.update();
+            
+            // Check for updates every 15 minutes
             setInterval(() => {
-              registration.update();
-            }, 60 * 60 * 1000);
+              registration.update().catch(err => {
+                console.log('ServiceWorker update check failed:', err);
+              });
+            }, 15 * 60 * 1000);
+            
+            // Listen for new service worker installation
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              console.log('New service worker found, state:', newWorker.state);
+              
+              newWorker.addEventListener('statechange', () => {
+                console.log('Service worker state changed:', newWorker.state);
+                
+                // When the new service worker is installed, prompt user to update
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('New content is available; please refresh.');
+                  // Optional: Show a notification to the user
+                  if (window.confirm('A new version is available. Refresh now?')) {
+                    window.location.reload();
+                  }
+                }
+              });
+            });
           })
           .catch(err => {
-            console.log('ServiceWorker registration failed: ', err);
+            console.error('ServiceWorker registration failed: ', err);
           });
+          
+        // Track service worker state changes
+        let preventDevToolsReloadLoop = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (preventDevToolsReloadLoop) return;
+          
+          console.log('Controller changed, reloading page...');
+          preventDevToolsReloadLoop = true;
+          window.location.reload();
+        });
       });
     }
   </script>
