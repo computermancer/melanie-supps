@@ -1,43 +1,32 @@
-const CACHE_VERSION = 'v3';
-const CACHE_NAME = `support-guide-${CACHE_VERSION}`;
-
-// List of files to cache - using self.__WB_MANIFEST for workbox compatibility
-const urlsToCache = [
+const CACHE_NAME = 'support-guide-v1';
+const CACHE_FILES = [
   '/',
-  '/index.html'
+  '/index.html',
+  '/assets/index.js',
+  '/assets/index.css'
 ];
 
 // Install event - cache the application shell
 self.addEventListener('install', event => {
+  console.log('Service Worker installing.');
   // Skip waiting to activate the new service worker immediately
   self.skipWaiting();
   
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        // Try to add each URL to cache, but don't fail if some fail
-        return Promise.all(
-          urlsToCache.map(url => {
-            return fetch(url, { cache: 'no-cache' })
-              .then(response => {
-                if (response.ok) {
-                  return cache.put(url, response);
-                }
-                console.log(`Failed to cache ${url}: ${response.status}`);
-                return Promise.resolve();
-              })
-              .catch(error => {
-                console.log(`Error caching ${url}:`, error);
-                return Promise.resolve();
-              });
-          })
-        );
+        console.log('Caching app shell');
+        return cache.addAll(CACHE_FILES);
+      })
+      .catch(error => {
+        console.error('Cache addAll error:', error);
       })
   );
 });
 
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
+  console.log('Service Worker activating.');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
@@ -47,10 +36,10 @@ self.addEventListener('activate', event => {
             return caches.delete(cacheName);
           }
         })
-      ).then(() => {
-        // Take control of all clients immediately
-        return self.clients.claim();
-      });
+      );
+    }).then(() => {
+      // Take control of all clients immediately
+      return self.clients.claim();
     })
   );
 });
@@ -62,31 +51,12 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Skip cross-origin requests
-  if (!event.request.url.startsWith(self.location.origin)) {
-    return;
-  }
-
-  // For navigation requests, try the network first, then cache
+  // For navigation requests, always serve index.html
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          // If we got a valid response, cache it
-          if (response.status === 200) {
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, responseToCache);
-            });
-          }
-          return response;
-        })
-        .catch(() => {
-          // If network fails, try to get from cache
-          return caches.match(event.request).then(response => {
-            return response || caches.match('/index.html');
-          });
-        })
+      caches.match('/index.html')
+        .then(response => response || fetch(event.request))
+        .catch(() => caches.match('/index.html'))
     );
     return;
   }
@@ -94,10 +64,10 @@ self.addEventListener('fetch', event => {
   // For other requests, try cache first, then network
   event.respondWith(
     caches.match(event.request)
-      .then(cachedResponse => {
+      .then(response => {
         // Return cached response if found
-        if (cachedResponse) {
-          return cachedResponse;
+        if (response) {
+          return response;
         }
 
         // Otherwise, fetch from network
@@ -119,6 +89,12 @@ self.addEventListener('fetch', event => {
 
             return response;
           });
+      })
+      .catch(() => {
+        // If both cache and network fail, show a fallback
+        if (event.request.mode === 'navigate') {
+          return caches.match('/index.html');
+        }
       })
   );
 });

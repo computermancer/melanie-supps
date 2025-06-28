@@ -28,22 +28,19 @@ export default defineConfig({
   // Configure the build output
   build: {
     // Generate sourcemaps for better debugging
-    sourcemap: true,
+    sourcemap: 'hidden',
     // Configure rollup options
     rollupOptions: {
       output: {
         // Add content hashes to filenames for better caching
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
-        // Configure asset filenames
-        assetFileNames: (assetInfo) => {
-          const info = assetInfo.name.split('.');
-          const ext = info[info.length - 1];
-          return `assets/[name]-[hash][extname]`;
-        },
+        assetFileNames: 'assets/[name]-[hash][extname]',
       },
     },
-    // Add version info to manifest
+    // Generate manifest file for service worker
     manifest: true,
+    // Ensure the build directory is cleaned before building
+    emptyOutDir: true,
   },
 });

@@ -8,56 +8,61 @@
   <meta http-equiv="Expires" content="0" />
   <title>Support Guide App</title>
   <script>
-    // Register service worker with update handling
+    // Simple service worker registration with debug info
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(registration => {
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            
-            // Check for updates immediately
-            registration.update();
-            
-            // Check for updates every 15 minutes
-            setInterval(() => {
-              registration.update().catch(err => {
-                console.log('ServiceWorker update check failed:', err);
-              });
-            }, 15 * 60 * 1000);
-            
-            // Listen for new service worker installation
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              console.log('New service worker found, state:', newWorker.state);
-              
-              newWorker.addEventListener('statechange', () => {
-                console.log('Service worker state changed:', newWorker.state);
-                
-                // When the new service worker is installed, prompt user to update
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('New content is available; please refresh.');
-                  // Optional: Show a notification to the user
-                  if (window.confirm('A new version is available. Refresh now?')) {
-                    window.location.reload();
-                  }
-                }
-              });
+      // Unregister any existing service workers first
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (let registration of registrations) {
+          console.log('Unregistering service worker:', registration.scope);
+          registration.unregister();
+        }
+        
+        // Clear all caches
+        if ('caches' in window) {
+          caches.keys().then(cacheNames => {
+            cacheNames.forEach(cacheName => {
+              console.log('Deleting cache:', cacheName);
+              caches.delete(cacheName);
             });
-          })
-          .catch(err => {
-            console.error('ServiceWorker registration failed: ', err);
+            
+            // Register the service worker after cleanup
+            registerServiceWorker();
+          });
+        } else {
+          registerServiceWorker();
+        }
+      }).catch(err => {
+        console.error('Error during service worker cleanup:', err);
+        registerServiceWorker();
+      });
+    }
+    
+    function registerServiceWorker() {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('ServiceWorker registration successful with scope:', registration.scope);
+          
+          // Force the waiting service worker to become active
+          if (registration.waiting) {
+            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+          }
+          
+          // Refresh the page when the new service worker is activated
+          let refreshing = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+              console.log('Controller changed, reloading...');
+              refreshing = true;
+              window.location.reload();
+            }
           });
           
-        // Track service worker state changes
-        let preventDevToolsReloadLoop = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (preventDevToolsReloadLoop) return;
-          
-          console.log('Controller changed, reloading page...');
-          preventDevToolsReloadLoop = true;
-          window.location.reload();
+          // Check for updates every minute (for testing)
+          setInterval(() => registration.update(), 60000);
+        })
+        .catch(err => {
+          console.error('ServiceWorker registration failed:', err);
         });
-      });
     }
   </script>
   <script type="module" src="/main.jsx"></script>
