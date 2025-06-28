@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import Protocol from './pages/Protocol';
 import MobileFriendlyProtocol from './pages/MobileFriendlyProtocol';
@@ -8,6 +8,34 @@ import TieredProtocol from './pages/TieredProtocol';
 import MobileFriendlyTieredProtocol from './pages/MobileFriendlyTieredProtocol';
 import HowToUse from './pages/HowToUse';
 import Resources from './pages/Resources';
+
+// This component handles client-side routing fallback
+function RouteFallback() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    // If we land on a 404, redirect to home
+    if (location.pathname !== '/') {
+      navigate('/', { replace: true });
+    }
+  }, [location, navigate]);
+  
+  return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="text-center p-6 max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold mb-4">Page Not Found</h2>
+        <p className="mb-6">The page you're looking for doesn't exist or has been moved.</p>
+        <Link 
+          to="/" 
+          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors inline-block"
+        >
+          Go to Home
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -51,7 +79,8 @@ export default function App() {
             <Route path="/mobile-protocol" element={<MobileFriendlyProtocol />} />
             <Route path="/how-to-use" element={<HowToUse />} />
             <Route path="/resources" element={<Resources />} />
-            <Route path="*" element={<HomePage />} />
+            {/* Catch-all route for 404 handling */}
+            <Route path="*" element={<RouteFallback />} />
           </Routes>
         </main>
       </div>
