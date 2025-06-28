@@ -1,6 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import { readFileSync } from 'fs';
+
+// Read the index.html file to serve it for all routes
+const htmlContent = readFileSync(resolve(__dirname, 'index.html'), 'utf-8');
 
 export default defineConfig(({ command }) => {
   const isProduction = command === 'build';
@@ -21,12 +25,15 @@ export default defineConfig(({ command }) => {
         // Allow serving files from one level up from the package root
         allow: ['..']
       },
-      // This middleware handles SPA fallback for development
-      // It's a simple way to ensure all routes work in development
-      // without requiring a complex server configuration
-      // Note: For production, you'll need to configure your server
-      // to serve index.html for all routes
-      middlewareMode: 'html',
+      // Handle SPA fallback
+      proxy: {
+        // This will handle all routes that don't have a file extension
+        '^/(?!.*\\.(js|css|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|mp4|webm|wav|mp3|m4a|aac|oga)$)': {
+          target: 'http://localhost:5173',
+          changeOrigin: true,
+          rewrite: (path) => '/index.html'
+        }
+      }
     },
     
     // Configure the build output
@@ -52,8 +59,14 @@ export default defineConfig(({ command }) => {
     preview: {
       port: 5000,
       strictPort: true,
-      // This middleware handles SPA fallback for the preview server
-      middlewareMode: 'html',
+      // Handle SPA fallback in preview mode
+      proxy: {
+        '^/(?!.*\\.(js|css|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|mp4|webm|wav|mp3|m4a|aac|oga)$)': {
+          target: 'http://localhost:5000',
+          changeOrigin: true,
+          rewrite: (path) => '/index.html'
+        }
+      }
     },
     
     // This is a custom plugin to handle SPA fallback in development
@@ -61,8 +74,10 @@ export default defineConfig(({ command }) => {
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         // If the request is for a file that doesn't exist, serve index.html
-        if (!req.url.includes('.') && req.url !== '/') {
-          req.url = '/';
+        if (!req.url.includes('.') && !req.url.startsWith('/api')) {
+          res.setHeader('Content-Type', 'text/html');
+          res.end(htmlContent);
+          return;
         }
         next();
       });
