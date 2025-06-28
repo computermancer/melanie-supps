@@ -10,8 +10,7 @@ export default defineConfig(({ command, mode }) => {
     plugins: [react()],
     
     // Base public path when served in development or production
-    // For Vercel, we use an empty base path since it's served from the root
-    base: process.env.NODE_ENV === 'production' ? '/' : '/',
+    base: '/',
     
     // Development server configuration
     server: {
