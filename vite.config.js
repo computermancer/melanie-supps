@@ -2,6 +2,10 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+  optimizeDeps: {
+    exclude: [],
+    include: ['react', 'react-dom', 'react-router-dom']
+  },
   plugins: [react()],
   // Add base URL for GitHub Pages
   base: '/',
@@ -12,15 +16,13 @@ export default defineConfig({
     // Enable HMR (Hot Module Replacement)
     hmr: true,
     headers: {
-      'Cache-Control': 'no-store, max-age=0',
-      'Service-Worker-Allowed': '/'
+      'Cache-Control': 'no-store, max-age=0'
     },
   },
   // Configure preview server for testing production build locally
   preview: {
     headers: {
-      'Cache-Control': 'no-store, max-age=0',
-      'Service-Worker-Allowed': '/'
+      'Cache-Control': 'no-store, max-age=0'
     },
     port: 5000,
     strictPort: true,
@@ -38,8 +40,6 @@ export default defineConfig({
         assetFileNames: 'assets/[name]-[hash][extname]',
       },
     },
-    // Generate manifest file for service worker
-    manifest: true,
     // Ensure the build directory is cleaned before building
     emptyOutDir: true,
   },
