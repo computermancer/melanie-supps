@@ -19,6 +19,12 @@
     "node": ">=14.0.0"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/material": "^5.13.5",
+    "@vercel/node": "^3.0.0",
+    "axios": "^1.5.0",
     "express": "^4.18.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -26,7 +32,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.0",
+    "@vitejs/plugin-react": "^4.0.4",
     "autoprefixer": "^10.4.14",
     "eslint": "^9.30.0",
     "eslint-config-prettier": "^10.1.5",
@@ -37,6 +43,7 @@
     "postcss": "^8.4.21",
     "prettier": "^3.6.2",
     "tailwindcss": "^3.3.2",
+    "terser": "^5.43.1",
     "vite": "^4.3.9"
   }
 }

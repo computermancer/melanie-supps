@@ -6,24 +6,34 @@ export default defineConfig(({ command, mode }) => {
   const isProduction = command === 'build';
   const isDev = !isProduction;
   
+  // For Vercel deployment, ensure we're using the correct base URL
+  const base = process.env.VERCEL ? '/' : '/';
+  
   return {
     plugins: [react()],
     
     // Base public path when served in development or production
-    base: '/',
+    base,
     
     // Development server configuration
     server: {
       port: 5173,
       strictPort: true,
       cors: true,
-      // This handles the SPA fallback for client-side routing
       fs: {
         // Allow serving files from one level up from the package root
         allow: ['..']
       },
       // Handle SPA fallback in development
-      historyApiFallback: true
+      historyApiFallback: true,
+      // Custom middleware for SPA fallback
+      proxy: {
+        '^/(?!.*\\.(js|css|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|mp4|webm|wav|mp3|m4a|aac|oga)$)': {
+          target: 'http://localhost:5173',
+          changeOrigin: true,
+          rewrite: (path) => '/index.html'
+        }
+      }
     },
     
     // Build configuration
@@ -32,6 +42,9 @@ export default defineConfig(({ command, mode }) => {
       sourcemap: isProduction ? 'hidden' : false,
       // Configure rollup options
       rollupOptions: {
+        input: {
+          main: resolve(__dirname, 'index.html')
+        },
         output: {
           // Ensure consistent hashed filenames for better caching
           entryFileNames: 'assets/[name]-[hash].js',
@@ -43,23 +56,8 @@ export default defineConfig(({ command, mode }) => {
       minify: isProduction ? 'terser' : false,
       // Don't clear the screen when errors occur
       clearScreen: false,
-    },
-    
-    // Configure the build output
-    build: {
-      // Generate sourcemaps for better debugging
-      sourcemap: 'hidden',
-      // Configure rollup options
-      rollupOptions: {
-        input: {
-          main: resolve(__dirname, 'index.html')
-        },
-        output: {
-          entryFileNames: 'assets/[name]-[hash].js',
-          chunkFileNames: 'assets/[name]-[hash].js',
-          assetFileNames: 'assets/[name]-[hash][extname]',
-        },
-      },
+      // Output directory for the build
+      outDir: 'dist',
       // Ensure the build directory is cleaned before building
       emptyOutDir: true,
     },
@@ -79,14 +77,11 @@ export default defineConfig(({ command, mode }) => {
     },
     
     // This is a custom plugin to handle SPA fallback in development
-    // It's a simple implementation that works for most cases
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         // If the request is for a file that doesn't exist, serve index.html
         if (!req.url.includes('.') && !req.url.startsWith('/api')) {
-          res.setHeader('Content-Type', 'text/html');
-          res.end(htmlContent);
-          return;
+          req.url = '/index.html';
         }
         next();
       });
