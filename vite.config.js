@@ -16,7 +16,7 @@ export default defineConfig({
       'Service-Worker-Allowed': '/'
     },
   },
-  // Configure preview server
+  // Configure preview server for testing production build locally
   preview: {
     headers: {
       'Cache-Control': 'no-store, max-age=0',
@@ -35,21 +35,15 @@ export default defineConfig({
         // Add content hashes to filenames for better caching
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash][extname]',
-        // Add version hash to all asset URLs
+        // Configure asset filenames
         assetFileNames: (assetInfo) => {
           const info = assetInfo.name.split('.');
           const ext = info[info.length - 1];
-          return `assets/[name]-[hash][extname]?v=${Date.now()}`;
+          return `assets/[name]-[hash][extname]`;
         },
       },
     },
     // Add version info to manifest
     manifest: true,
-  },
-  // Configure the preview server (for testing the production build locally)
-  preview: {
-    port: 5000,
-    strictPort: true,
   },
 });

@@ -1,9 +1,12 @@
-const CACHE_NAME = 'support-guide-v1';
+const CACHE_VERSION = 'v2';
+const CACHE_NAME = `support-guide-${CACHE_VERSION}`;
+
+// List of files to cache
 const urlsToCache = [
   '/',
   '/index.html',
-  '/assets/index.js',
-  '/assets/index.css'
+  '/assets/index.css',
+  '/assets/index.js'
 ];
 
 // Install event - cache the application shell
