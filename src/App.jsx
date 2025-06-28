@@ -56,27 +56,33 @@ export default function App() {
   
   // Version check and force reload logic
   useEffect(() => {
-    const currentVersion = '1.0.2'; // Incremented version
+    const currentVersion = '1.0.3'; // Incremented version
     const lastVersion = localStorage.getItem('appVersion');
     
-    if (lastVersion !== currentVersion) {
-      // Clear all caches and local storage
-      if ('caches' in window) {
-        caches.keys().then((cacheNames) => {
-          cacheNames.forEach((cacheName) => {
-            caches.delete(cacheName);
-          });
-        });
+    const clearCaches = async () => {
+      try {
+        if ('caches' in window) {
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
+          console.log('Caches cleared');
+        }
+        
+        // Clear specific local storage items
+        localStorage.removeItem('disclaimerAgreedTimestamp');
+        
+        // Update the stored version
+        localStorage.setItem('appVersion', currentVersion);
+        
+        // Force reload to get fresh assets
+        window.location.href = '/';
+      } catch (error) {
+        console.error('Error clearing caches:', error);
       }
-      
-      // Clear potential problematic items
-      localStorage.removeItem('disclaimerAgreedTimestamp');
-      
-      // Update the stored version
-      localStorage.setItem('appVersion', currentVersion);
-      
-      // Force reload to get fresh assets
-      window.location.reload();
+    };
+    
+    if (lastVersion !== currentVersion) {
+      console.log(`Updating from version ${lastVersion} to ${currentVersion}`);
+      clearCaches();
     }
   }, []);
 

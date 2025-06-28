@@ -1,10 +1,26 @@
-const CACHE_NAME = 'support-guide-v1';
+const CACHE_NAME = 'support-guide-v2';
 const CACHE_FILES = [
   '/',
   '/index.html',
-  '/assets/index.js',
-  '/assets/index.css'
+  '/protocol',
+  '/protocol/',
+  '/evidence',
+  '/evidence/',
+  '/tiered',
+  '/tiered/',
+  '/how-to-use',
+  '/how-to-use/',
+  '/mobile-protocol',
+  '/mobile-protocol/',
+  '/mobile-tiered',
+  '/mobile-tiered/'
 ];
+
+// Always serve index.html for navigation requests
+const shouldAlwaysServeIndex = (request) => {
+  return request.mode === 'navigate' || 
+         request.headers.get('accept').includes('text/html');
+};
 
 // Install event - cache the application shell
 self.addEventListener('install', event => {
@@ -51,12 +67,32 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // For navigation requests, always serve index.html
-  if (event.request.mode === 'navigate') {
+  const requestUrl = new URL(event.request.url);
+  
+  // Skip cross-origin requests
+  if (requestUrl.origin !== location.origin) {
+    return;
+  }
+
+  // Handle navigation requests
+  if (shouldAlwaysServeIndex(event.request)) {
     event.respondWith(
       caches.match('/index.html')
-        .then(response => response || fetch(event.request))
-        .catch(() => caches.match('/index.html'))
+        .then(cachedResponse => {
+          // Always fetch from network first for navigation requests
+          return fetch(event.request)
+            .then(networkResponse => {
+              // Update cache with fresh response
+              const responseToCache = networkResponse.clone();
+              caches.open(CACHE_NAME)
+                .then(cache => cache.put(event.request, responseToCache));
+              return networkResponse;
+            })
+            .catch(() => {
+              // If network fails, return cached response or index.html
+              return cachedResponse || caches.match('/index.html');
+            });
+        })
     );
     return;
   }
@@ -64,10 +100,10 @@ self.addEventListener('fetch', event => {
   // For other requests, try cache first, then network
   event.respondWith(
     caches.match(event.request)
-      .then(response => {
+      .then(cachedResponse => {
         // Return cached response if found
-        if (response) {
-          return response;
+        if (cachedResponse) {
+          return cachedResponse;
         }
 
         // Otherwise, fetch from network
@@ -83,18 +119,10 @@ self.addEventListener('fetch', event => {
 
             // Cache the response
             caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
+              .then(cache => cache.put(event.request, responseToCache));
 
             return response;
           });
-      })
-      .catch(() => {
-        // If both cache and network fail, show a fallback
-        if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
-        }
       })
   );
 });
