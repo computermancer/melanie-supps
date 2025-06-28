@@ -53,6 +53,8 @@ export default function App() {
             <Route path="/disclaimer" element={<Disclaimer />} />
             <Route path="/how-to-use" element={<HowToUse />} />
             <Route path="/resources" element={<Resources />} />
+            {/* Catch all other routes and redirect to home */}
+            <Route path="*" element={<HomePage />} />
           </Routes>
         </main>
       </div>
