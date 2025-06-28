@@ -12,6 +12,29 @@ import Resources from './pages/Resources';
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(false);
+  
+  // Version check and force reload logic
+  useEffect(() => {
+    const currentVersion = '1.0.1'; // Update this with each deployment
+    const lastVersion = localStorage.getItem('appVersion');
+    
+    if (lastVersion !== currentVersion) {
+      // Clear all caches
+      if ('caches' in window) {
+        caches.keys().then((cacheNames) => {
+          cacheNames.forEach((cacheName) => {
+            caches.delete(cacheName);
+          });
+        });
+      }
+      
+      // Update the stored version
+      localStorage.setItem('appVersion', currentVersion);
+      
+      // Force reload to get fresh assets
+      window.location.reload(true);
+    }
+  }, []);
 
   return (
     <div className={darkMode ? 'dark' : ''}>

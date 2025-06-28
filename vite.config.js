@@ -11,6 +11,19 @@ export default defineConfig({
     cors: true,
     // Enable HMR (Hot Module Replacement)
     hmr: true,
+    headers: {
+      'Cache-Control': 'no-store, max-age=0',
+      'Service-Worker-Allowed': '/'
+    },
+  },
+  // Configure preview server
+  preview: {
+    headers: {
+      'Cache-Control': 'no-store, max-age=0',
+      'Service-Worker-Allowed': '/'
+    },
+    port: 5000,
+    strictPort: true,
   },
   // Configure the build output
   build: {
@@ -23,8 +36,16 @@ export default defineConfig({
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash][extname]',
+        // Add version hash to all asset URLs
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name.split('.');
+          const ext = info[info.length - 1];
+          return `assets/[name]-[hash][extname]?v=${Date.now()}`;
+        },
       },
     },
+    // Add version info to manifest
+    manifest: true,
   },
   // Configure the preview server (for testing the production build locally)
   preview: {
