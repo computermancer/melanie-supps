@@ -6,41 +6,61 @@ export default defineConfig(({ command, mode }) => {
   const isProduction = command === 'build';
   const isDev = !isProduction;
   
-  // For Vercel deployment, ensure we're using the correct base URL
-  const base = process.env.VERCEL ? '/' : '/';
+  // Base URL configuration
+  const base = '/';
   
+  // Development server proxy configuration
+  const proxyConfig = {
+    '^/api/.*': {
+      target: 'http://localhost:3000',
+      changeOrigin: true,
+      secure: false,
+      rewrite: (path) => path.replace(/^\/api/, '')
+    }
+  };
+
   return {
-    plugins: [react()],
+    plugins: [
+      react({
+        // Enable Fast Refresh
+        fastRefresh: true,
+      })
+    ],
     
-    // Base public path when served in development or production
+    // Base public path
     base,
     
     // Development server configuration
     server: {
       port: 5173,
       strictPort: true,
+      host: true, // Listen on all network interfaces
+      open: !process.env.CI,
       cors: true,
       fs: {
-        // Allow serving files from one level up from the package root
-        allow: ['..']
+        // Allow serving files from the project root
+        allow: ['.', '..']
       },
-      // Handle SPA fallback in development
-      historyApiFallback: true,
-      // Custom middleware for SPA fallback
-      proxy: {
-        '^/(?!.*\\.(js|css|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|mp4|webm|wav|mp3|m4a|aac|oga)$)': {
-          target: 'http://localhost:5173',
-          changeOrigin: true,
-          rewrite: (path) => '/index.html'
-        }
-      }
+      proxy: proxyConfig,
+      // Enable HMR (Hot Module Replacement)
+      hmr: {
+        overlay: true
+      },
     },
     
     // Build configuration
     build: {
-      // Generate sourcemaps for production
+      // Output directory for the build
+      outDir: 'dist',
+      // Generate sourcemaps for production builds
       sourcemap: isProduction ? 'hidden' : false,
-      // Configure rollup options
+      // Minify the production build
+      minify: isProduction ? 'terser' : false,
+      // Don't clear the screen when errors occur
+      clearScreen: false,
+      // Clean the output directory before building
+      emptyOutDir: true,
+      // Rollup options
       rollupOptions: {
         input: {
           main: resolve(__dirname, 'index.html')
@@ -52,21 +72,21 @@ export default defineConfig(({ command, mode }) => {
           assetFileNames: 'assets/[name]-[hash][extname]',
         },
       },
-      // Minify for production
-      minify: isProduction ? 'terser' : false,
-      // Don't clear the screen when errors occur
-      clearScreen: false,
-      // Output directory for the build
-      outDir: 'dist',
-      // Ensure the build directory is cleaned before building
-      emptyOutDir: true,
+      // Terser options for production builds
+      terserOptions: isProduction ? {
+        compress: {
+          drop_console: true,
+          drop_debugger: true,
+        },
+      } : {},
     },
     
-    // Configure the preview server
+    // Preview server configuration
     preview: {
       port: 5000,
       strictPort: true,
-      // Handle SPA fallback in preview mode
+      cors: true,
+      // SPA fallback for preview server
       proxy: {
         '^/(?!.*\\.(js|css|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|mp4|webm|wav|mp3|m4a|aac|oga)$)': {
           target: 'http://localhost:5000',
@@ -76,15 +96,34 @@ export default defineConfig(({ command, mode }) => {
       }
     },
     
-    // This is a custom plugin to handle SPA fallback in development
+    // Custom middleware for SPA fallback in development
     configureServer(server) {
-      server.middlewares.use((req, res, next) => {
-        // If the request is for a file that doesn't exist, serve index.html
-        if (!req.url.includes('.') && !req.url.startsWith('/api')) {
-          req.url = '/index.html';
-        }
-        next();
-      });
-    }
+      return () => {
+        server.middlewares.use((req, res, next) => {
+          // If the request is for a file that doesn't exist, serve index.html
+          if (!req.url.includes('.') && !req.url.startsWith('/api') && !req.url.startsWith('/_vite')) {
+            req.url = '/index.html';
+          }
+          next();
+        });
+      };
+    },
+    
+    // Optimize dependencies
+    optimizeDeps: {
+      include: ['react', 'react-dom', 'react-router-dom'],
+      exclude: [],
+    },
+    
+    // CSS configuration
+    css: {
+      devSourcemap: isDev,
+      modules: {
+        localsConvention: 'camelCaseOnly',
+      },
+    },
+    
+    // Log level
+    logLevel: isProduction ? 'warn' : 'info',
   };
 });
