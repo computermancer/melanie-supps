@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import Protocol from './pages/Protocol';
+import MobileFriendlyProtocol from './pages/MobileFriendlyProtocol';
 import Evidence from './pages/Evidence';
 import TieredProtocol from './pages/TieredProtocol';
+import MobileFriendlyTieredProtocol from './pages/MobileFriendlyTieredProtocol';
 import Disclaimer from './pages/Disclaimer';
 import HowToUse from './pages/HowToUse';
 import Resources from './pages/Resources';
@@ -46,6 +48,8 @@ export default function App() {
             <Route path="/protocol" element={<Protocol />} />
             <Route path="/evidence" element={<Evidence />} />
             <Route path="/tiered" element={<TieredProtocol />} />
+            <Route path="/mobile-tiered" element={<MobileFriendlyTieredProtocol />} />
+            <Route path="/mobile-protocol" element={<MobileFriendlyProtocol />} />
             <Route path="/disclaimer" element={<Disclaimer />} />
             <Route path="/how-to-use" element={<HowToUse />} />
             <Route path="/resources" element={<Resources />} />

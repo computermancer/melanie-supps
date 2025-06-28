@@ -4,9 +4,13 @@ const DisclaimerModal = ({ isOpen, onAgree }) => {
   const modalRef = useRef(null);
 
   useEffect(() => {
-    // Prevent scrolling when modal is open
+    // Prevent scrolling when modal is open and scroll to top
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      // Scroll the modal content to the top when it opens
+      if (modalRef.current) {
+        modalRef.current.scrollTop = 0;
+      }
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -21,7 +25,7 @@ const DisclaimerModal = ({ isOpen, onAgree }) => {
 
   return (
     <div 
-      className="fixed inset-2 bg-black bg-opacity-50 flex items-start justify-center p-4 pt-20 z-50"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 pt-20 z-50 overflow-y-auto"
       onClick={(e) => {
         // Close modal when clicking outside the content
         if (e.target === modalRef.current) {

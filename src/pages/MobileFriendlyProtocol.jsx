@@ -1,16 +1,5 @@
-import React from "react";
-
-// Force left alignment with !important
-const styles = `
-  .force-left {
-    text-align: left !important;
-    justify-content: flex-start !important;
-    margin-left: 0 !important;
-    margin-right: auto !important;
-    display: block !important;
-    width: 100% !important;
-  }
-`;
+import React, { useState } from "react";
+import SupplementModal from "../components/SupplementModal";
 
 const dataSections = [
   {
@@ -75,9 +64,24 @@ const dataSections = [
 import { Link } from 'react-router-dom';
 
 export default function Protocol() {
+  const [selectedSupplement, setSelectedSupplement] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleSupplementClick = (supplement, section) => {
+    // Add section columns to the supplement data for display in modal
+    const supplementWithColumns = [...supplement];
+    supplementWithColumns.columns = section.columns;
+    setSelectedSupplement(supplementWithColumns);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedSupplement(null);
+  };
+
   return (
-    <div className="p-6 max-w-7xl mx-auto text-gray-800 dark:text-gray-100 space-y-6">
-      <style>{styles}</style>
+    <div className="p-4 max-w-7xl mx-auto text-gray-800 dark:text-gray-100 space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-3xl md:text-4xl font-semibold text-black dark:text-white">
           Comprehensive Nutrient & Supplement Protocol
@@ -85,70 +89,51 @@ export default function Protocol() {
         <div className="flex gap-3 w-full sm:w-auto">
           <Link
             to="/mobile-protocol"
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm font-medium transition-colors text-center"
+            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md shadow-sm font-medium transition-colors text-center"
           >
-            Mobile View
+            Mobile View (Current)
           </Link>
           <Link
             to="/protocol"
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md shadow-sm font-medium transition-colors text-center"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm font-medium transition-colors text-center"
           >
-            Full View (Current)
+            Full View
           </Link>
+
         </div>
       </div>
       <div className="pt-4">
 
       {dataSections.map((section, index) => (
-        <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6 overflow-hidden">
-          <div className="p-5">
-            <h2 
-              className="text-xl font-semibold mb-4 text-gray-800 dark:text-white force-left"
-            >
-              {section.title}
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse">
-                <thead>
-                  <tr className="bg-gray-50 dark:bg-gray-700">
-                    {section.columns.map((col, idx) => (
-                      <th 
-                        key={idx} 
-                        className="border border-gray-200 dark:border-gray-600 px-4 py-3 text-left text-gray-700 dark:text-gray-300 font-medium"
-                        style={{ textAlign: 'left' }}
-                      >
-                        {col}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {section.rows.map((row, ridx) => (
-                    <tr
-                      key={ridx}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                    >
-                      {row.map((cell, cidx) => (
-                        <td
-                          key={cidx}
-                          className={`border border-gray-200 dark:border-gray-600 px-4 py-3 text-left ${
-                            section.columns[cidx]?.toLowerCase().includes("caution") || 
-                            section.columns[cidx]?.toLowerCase().includes("contra") 
-                              ? "text-red-600 dark:text-red-400 font-medium" 
-                              : "text-gray-700 dark:text-gray-300"
-                          }`}
-                        >
-                          {cell}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+        <div key={index} className="space-y-4">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+            {section.title}
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {section.rows.map((row, rowIndex) => (
+              <button
+                key={rowIndex}
+                onClick={() => handleSupplementClick(row, section)}
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-left hover:shadow-md transition-shadow"
+              >
+                <h3 className="font-semibold text-lg text-gray-800 dark:text-white mb-2">
+                  {row[0]}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
+                  {row[1]} {/* Show the benefits as a preview */}
+                </p>
+              </button>
+            ))}
           </div>
         </div>
       ))}
+
+      <SupplementModal 
+        isOpen={isModalOpen} 
+        onClose={closeModal} 
+        supplement={selectedSupplement} 
+      />
       </div>
     </div>
   );
