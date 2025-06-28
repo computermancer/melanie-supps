@@ -1,13 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
-import { readFileSync } from 'fs';
 
-// Read the index.html file to serve it for all routes
-const htmlContent = readFileSync(resolve(__dirname, 'index.html'), 'utf-8');
-
-export default defineConfig(({ command }) => {
+export default defineConfig(({ command, mode }) => {
   const isProduction = command === 'build';
+  const isDev = !isProduction;
   
   return {
     plugins: [react()],
@@ -25,15 +22,8 @@ export default defineConfig(({ command }) => {
         // Allow serving files from one level up from the package root
         allow: ['..']
       },
-      // Handle SPA fallback
-      proxy: {
-        // This will handle all routes that don't have a file extension
-        '^/(?!.*\\.(js|css|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|mp4|webm|wav|mp3|m4a|aac|oga)$)': {
-          target: 'http://localhost:5173',
-          changeOrigin: true,
-          rewrite: (path) => '/index.html'
-        }
-      }
+      // Handle SPA fallback in development
+      historyApiFallback: true,
     },
     
     // Configure the build output
