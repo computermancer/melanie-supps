@@ -23,15 +23,26 @@ export default defineConfig(({ command, mode }) => {
         allow: ['..']
       },
       // Handle SPA fallback in development
-      historyApiFallback: true,
-      // Enable HMR (Hot Module Replacement)
-      hmr: {
-        overlay: true
+      historyApiFallback: true
+    },
+    
+    // Build configuration
+    build: {
+      // Generate sourcemaps for production
+      sourcemap: isProduction ? 'hidden' : false,
+      // Configure rollup options
+      rollupOptions: {
+        output: {
+          // Ensure consistent hashed filenames for better caching
+          entryFileNames: 'assets/[name]-[hash].js',
+          chunkFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash][extname]',
+        },
       },
-      // Configure proxy if needed for API requests
-      proxy: {
-        // Example: '/api': 'http://localhost:3000'
-      }
+      // Minify for production
+      minify: isProduction ? 'terser' : false,
+      // Don't clear the screen when errors occur
+      clearScreen: false,
     },
     
     // Configure the build output
