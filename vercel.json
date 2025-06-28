@@ -5,20 +5,11 @@
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist",
-        "zeroConfig": true
+        "distDir": "dist"
       }
-    },
-    {
-      "src": "api/[[...path]].js",
-      "use": "@vercel/node"
     }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/[[...path]]"
-    },
     {
       "src": "/assets/(.*)",
       "headers": {
@@ -34,17 +25,8 @@
       "dest": "/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/api/[[...path]]",
-      "headers": {
-        "Cache-Control": "no-cache"
-      }
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/api/[[...path]]"
+      "src": "^/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
