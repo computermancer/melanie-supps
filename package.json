@@ -3,10 +3,17 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "vite",
+    "dev:open": "vite --open",
+    "dev:host": "vite --host",
+    "dev:port": "vite --port 3000",
+    "dev:https": "vite --https",
     "build": "vite build",
     "preview": "vite preview",
+    "preview:port": "vite preview --port 5000",
     "start": "node server.js",
-    "vercel-build": "vite build"
+    "vercel-build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "format": "prettier --write \"**/*.{js,jsx,json,md}\""
   },
   "engines": {
     "node": ">=14.0.0"
@@ -21,8 +28,14 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.0",
     "autoprefixer": "^10.4.14",
+    "eslint": "^9.30.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.5.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "gh-pages": "^6.3.0",
     "postcss": "^8.4.21",
+    "prettier": "^3.6.2",
     "tailwindcss": "^3.3.2",
     "vite": "^4.3.9"
   }

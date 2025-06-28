@@ -24,6 +24,14 @@ export default defineConfig(({ command, mode }) => {
       },
       // Handle SPA fallback in development
       historyApiFallback: true,
+      // Enable HMR (Hot Module Replacement)
+      hmr: {
+        overlay: true
+      },
+      // Configure proxy if needed for API requests
+      proxy: {
+        // Example: '/api': 'http://localhost:3000'
+      }
     },
     
     // Configure the build output
