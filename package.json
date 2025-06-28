@@ -6,8 +6,31 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "node server.js",
+    "vercel-build": "vite build",
     "deploy": "npm run build && echo 'support-guide-app.com' > dist/CNAME && gh-pages -d dist"
   },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
   "dependencies": {
     "express": "^4.18.2",
     "react": "^18.2.0",
