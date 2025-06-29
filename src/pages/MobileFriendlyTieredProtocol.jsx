@@ -81,20 +81,20 @@ export default function MobileFriendlyTieredProtocol() {
   };
 
   return (
-    <div className="p-4 max-w-7xl mx-auto text-gray-800 dark:text-gray-100 space-y-6">
+    <div className="p-16 max-w-7xl mx-auto text-gray-800 dark:text-gray-100 space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-3xl md:text-4xl font-semibold text-black dark:text-white">
           Tiered Recovery Protocol
         </h1>
         <div className="flex gap-3 w-full sm:w-auto">
           <Link
-            to="/mobile-tiered"
+            to="/tiered"
             className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md shadow-sm font-medium transition-colors text-center"
           >
             Mobile View (Current)
           </Link>
           <Link
-            to="/tiered"
+            to="/tiered/full"
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm font-medium transition-colors text-center"
           >
             Full View

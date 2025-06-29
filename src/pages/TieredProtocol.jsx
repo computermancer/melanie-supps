@@ -103,7 +103,7 @@ const trackingTools = [
 
 export default function TieredProtocol() {
   return (
-    <div className="p-6 max-w-7xl mx-auto text-gray-800 dark:text-gray-100 space-y-6">
+    <div className="p-8 max-w-7xl mx-auto text-gray-800 dark:text-gray-100 space-y-6">
       <style>{styles}</style>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-3xl md:text-4xl font-semibold text-black dark:text-white">
@@ -111,20 +111,20 @@ export default function TieredProtocol() {
         </h1>
         <div className="flex gap-3 w-full sm:w-auto">
           <Link
-            to="/mobile-tiered"
+            to="/tiered"
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm font-medium transition-colors text-center"
           >
             Mobile View
           </Link>
           <Link
-            to="/tiered"
+            to="/tiered/full"
             className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md shadow-sm font-medium transition-colors text-center"
           >
             Full View (Current)
           </Link>
         </div>
       </div>
-      <div className="pt-4">
+      <div>
       {phases.map((phase, index) => (
         <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6 overflow-hidden">
           <div className="p-5">

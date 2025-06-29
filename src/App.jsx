@@ -74,8 +74,10 @@ export default function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/protocol" element={<MobileFriendlyProtocol />} />
+            <Route path="/protocol/full" element={<Protocol />} />
             <Route path="/evidence" element={<Evidence />} />
             <Route path="/tiered" element={<MobileFriendlyTieredProtocol />} />
+            <Route path="/tiered/full" element={<TieredProtocol />} />
             <Route path="/how-to-use" element={<HowToUse />} />
             <Route path="/disclaimer" element={<Disclaimer />} />
             <Route path="/resources" element={<Resources />} />

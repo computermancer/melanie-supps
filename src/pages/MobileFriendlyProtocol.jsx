@@ -81,20 +81,20 @@ export default function Protocol() {
   };
 
   return (
-    <div className="p-4 max-w-7xl mx-auto text-gray-800 dark:text-gray-100 space-y-6">
+    <div className="p-10 max-w-7xl mx-auto text-gray-800 dark:text-gray-100 space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-3xl md:text-4xl font-semibold text-black dark:text-white">
           Comprehensive Nutrient & Supplement Protocol
         </h1>
         <div className="flex gap-3 w-full sm:w-auto">
           <Link
-            to="/mobile-protocol"
+            to="/protocol"
             className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md shadow-sm font-medium transition-colors text-center"
           >
             Mobile View (Current)
           </Link>
           <Link
-            to="/protocol"
+            to="/protocol/full"
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm font-medium transition-colors text-center"
           >
             Full View
