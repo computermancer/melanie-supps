@@ -8,6 +8,7 @@ import TieredProtocol from './pages/TieredProtocol';
 import MobileFriendlyTieredProtocol from './pages/MobileFriendlyTieredProtocol';
 import HowToUse from './pages/HowToUse';
 import Resources from './pages/Resources';
+import Disclaimer from './pages/Disclaimer';
 
 // This component handles client-side routing fallback
 function RouteFallback() {
@@ -72,14 +73,12 @@ export default function App() {
         <main className="p-4">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/protocol" element={<Protocol />} />
+            <Route path="/protocol" element={<MobileFriendlyProtocol />} />
             <Route path="/evidence" element={<Evidence />} />
-            <Route path="/tiered" element={<TieredProtocol />} />
-            <Route path="/mobile-tiered" element={<MobileFriendlyTieredProtocol />} />
-            <Route path="/mobile-protocol" element={<MobileFriendlyProtocol />} />
+            <Route path="/tiered" element={<MobileFriendlyTieredProtocol />} />
             <Route path="/how-to-use" element={<HowToUse />} />
+            <Route path="/disclaimer" element={<Disclaimer />} />
             <Route path="/resources" element={<Resources />} />
-            {/* Catch-all route for 404 handling */}
             <Route path="*" element={<RouteFallback />} />
           </Routes>
         </main>

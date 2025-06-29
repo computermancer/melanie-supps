@@ -6,6 +6,7 @@ const sections = [
   { title: 'Evidence-Based Breakdown', description: 'Learn the rationale behind each recommendation.', route: '/evidence' },
   { title: 'Tiered Protocol Plan', description: 'Follow a step-by-step approach.', route: '/tiered' },
   { title: 'How to Use This Guide', description: 'Approach and navigate this guide.', route: '/how-to-use' },
+  { title: 'Disclaimer', description: 'Important information about the use of this guide.', route: '/disclaimer' },
   // { title: 'Products Links', description: 'Helpful products.', route: '/resources' },
 ];
 
